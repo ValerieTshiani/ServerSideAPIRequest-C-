@@ -1,0 +1,25 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script src="~/lib/CalculatorAPI.js" type="text/javascript" asp-append-version="true"></script>
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Bitcoin and XRP Price Arbitrage  Calculator</h1>
+    <p>Please Click Bellow To Get the Required Values</p>
+    <div Class="col-md-12">
+        <a class="btn btn-sm btn-primary" onclick="Calculator.GetValues()">
+            Display Values
+        </a>
+    </div>
+
+    <div Class="row">
+        <div Class="col-md-6">
+            Arbitrage calculation for Bitcoin :
+            <div id="bitcoin"></div>
+        </div>
+        <div Class="col-md-6">
+            Arbitrage calculation for XRP :
+            <div id="xrp"></div>
+        </div>
+    </div>
+</div>
