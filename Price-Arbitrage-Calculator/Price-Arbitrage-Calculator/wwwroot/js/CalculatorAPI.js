@@ -22,8 +22,8 @@ var Calculator = {
     },
     DisplayValues: function (data) {
         console.log(data);
-
-        document.getElementById("bitcoin").innerHTML = data[0].Value;
-        document.getElementById("xrp").innerHTML = data[1].Value;
+      
+        document.getElementById("bitcoin").innerHTML = data.bitCoinArbitrageValue;
+        document.getElementById("xrp").innerHTML = data.xrpArbitrageValue;
     }
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj": {}
+    "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj": {}
   },
   "projects": {
-    "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj": {
+    "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
+        "projectUniqueName": "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
         "projectName": "Price-Arbitrage-Calculator",
-        "projectPath": "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
+        "projectPath": "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
         "packagesPath": "C:\\Users\\valerie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\obj\\",
+        "outputPath": "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

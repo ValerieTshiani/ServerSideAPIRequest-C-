@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VvwxbiKJqsnxBzc4Rwrj57ovDZukN8lCn9zuPinVsJmXy63YWBzcjq6UOcomSYzHvot79BxgYNpzYpOb9c5zqQ==",
+  "dgSpecHash": "9Z8Fg9OoPvvfxJ7JPhfbRQY1YuR5yrpJWfcdMA6PbhjMYG99eh6PYHUCOvlxCYdHbc80gKmvaZQz/2WY/riR7A==",
   "success": true,
-  "projectFilePath": "C:\\Users\\valerie\\source\\repos\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
+  "projectFilePath": "C:\\_GitHub\\ServerSideAPIRequest-C-\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator\\Price-Arbitrage-Calculator.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\valerie\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
   ],

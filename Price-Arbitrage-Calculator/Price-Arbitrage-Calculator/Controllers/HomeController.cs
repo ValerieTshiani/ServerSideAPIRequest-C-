@@ -38,9 +38,9 @@ namespace Price_Arbitrage_Calculator.Controllers
         }
 
         /// <summary>
-        /// Gets the Valuesfrom API Request, then calculate price arbitrage
+        /// Gets the Values from API Requests, then calculate price arbitrage
         /// </summary>
-        /// <returns> object with Arbitrage Value</returns>
+        /// <returns> returns json object with Arbitrage Values</returns>
         [HttpPost()]
         public JsonResult GetValues()
         {
@@ -55,10 +55,9 @@ namespace Price_Arbitrage_Calculator.Controllers
             double bitCoinArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidBitCoinObject.bidPrice), Convert.ToDouble(usdAskBitCoinObject.ask), usdZarExchange.conversion_rate);
             double xrpArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidXRPObject.bidPrice), Convert.ToDouble(usdAskXRPObject.ask), usdZarExchange.conversion_rate);
 
-            List<KeyValuePair<string, double>> returnObject = new List<KeyValuePair<string, double>>() {
-                    new KeyValuePair<string, double>("bitCoinArbitrageValue", Math.Round(bitCoinArbitrageValue,2) ),
-                    new KeyValuePair<string, double>("xrpArbitrageValue", Math.Round(xrpArbitrageValue,2) )
-                };
+            Dictionary<string, double> returnObject = new Dictionary<string, double>();
+            returnObject.Add("bitCoinArbitrageValue", Math.Round(bitCoinArbitrageValue, 2));
+            returnObject.Add("xrpArbitrageValue", Math.Round(xrpArbitrageValue, 2));
 
 
             return Json(returnObject);
@@ -66,7 +65,7 @@ namespace Price_Arbitrage_Calculator.Controllers
         /// <summary>
         /// Takes in values and places them in arbitrage formula
         /// </summary>
-        /// <returns> arbitrage value</returns>
+        /// <returns> returns arbitrage value</returns>
         public static double ArbitrageCaculator(double zarBid, double usdAsk, double usdZarExchange)
         {
             return (zarBid / (usdAsk * usdZarExchange));
@@ -120,7 +119,6 @@ namespace Price_Arbitrage_Calculator.Controllers
         /// <returns>Returns USD BID Price object </returns>
         public static Responses.BidResponse GetApiBid(string ApiUrl)
         {
-
             Responses.BidResponse responseObject = new Responses.BidResponse();
             var request = (HttpWebRequest)WebRequest.Create(ApiUrl);
             request.Method = "GET";
@@ -196,25 +194,34 @@ namespace Price_Arbitrage_Calculator.Controllers
         [HttpGet]
         public JsonResult GetArbitrageValueBitCoin()
         {
+            try
+            {
+                _logger.LogInformation("Fetching all the values from the different API requests and perfoming an BitCoint arbitrage calculation");
+                Responses.AskResponse usdAskBitCoinObject = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/btcusd/");
+                double usdAskBitCoin = Convert.ToDouble(usdAskBitCoinObject.ask);
 
-            Responses.AskResponse usdAskBitCoinObject = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/btcusd/");
-            double usdAskBitCoin = Convert.ToDouble(usdAskBitCoinObject.ask);
+                Responses.BidResponse zarBidBitCoinObject = GetApiBid("https://api.valr.com/v1/public/BTCZAR/marketsummary");
+                double zarBidBitCoin = Convert.ToDouble(zarBidBitCoinObject.bidPrice);
 
-            Responses.BidResponse zarBidBitCoinObject = GetApiBid("https://api.valr.com/v1/public/BTCZAR/marketsummary");
-            double zarBidBitCoin = Convert.ToDouble(zarBidBitCoinObject.bidPrice);
+                Responses.ExchangeResponse usdZarExchangeObject = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
+                double usdZarExchange = usdZarExchangeObject.conversion_rate;
 
-            Responses.ExchangeResponse usdZarExchangeObject = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
-            double usdZarExchange = usdZarExchangeObject.conversion_rate;
+                double bitCoinArbitrageValue = ArbitrageCaculator(zarBidBitCoin, usdAskBitCoin, usdZarExchange);
 
-            double bitCoinArbitrageValue = ArbitrageCaculator(zarBidBitCoin, usdAskBitCoin, usdZarExchange);
-           
-            Dictionary<string, double> listObject = new Dictionary<string, double>();
-            listObject.Add("zarBidBitCoin", zarBidBitCoin);
-            listObject.Add("usdAskBitCoin", usdAskBitCoin);
-            listObject.Add("usdZarExchange", usdZarExchange);
-            listObject.Add("arbitragecalculationforBitcoin", Math.Round(bitCoinArbitrageValue, 2));
+                Dictionary<string, double> listObject = new Dictionary<string, double>();
+                listObject.Add("zarBidBitCoin", zarBidBitCoin);
+                listObject.Add("usdAskBitCoin", usdAskBitCoin);
+                listObject.Add("usdZarExchange", usdZarExchange);
+                listObject.Add("arbitrageCalculationForBitcoin", Math.Round(bitCoinArbitrageValue, 2));
 
-            return Json(listObject);
+                _logger.LogInformation($"Returning BitCoin Price Arbitage values and calculation result.");
+                return Json(listObject);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong: {ex}");
+                return Json(StatusCode(500, "Internal server error"));
+            }
         }
 
         /// <summary>
@@ -223,30 +230,36 @@ namespace Price_Arbitrage_Calculator.Controllers
         /// <returns>A chart details object</returns>
         [Route("~/api/GetArbitrageValueXRP")]
         [HttpGet]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async JsonResult GetArbitrageValueXRP()
+        public JsonResult GetArbitrageValueXRP()
         {
-            Responses.AskResponse usdAskXRPObject = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/xrpusd/");
-            double usdAskXRP = Convert.ToDouble(usdAskXRPObject.ask);
+            try
+            {
+                _logger.LogInformation("Fetching all the values from the different API requests and perfoming an XRP arbitrage calculation");
+                Responses.AskResponse usdAskXRPObject = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/xrpusd/");
+                double usdAskXRP = Convert.ToDouble(usdAskXRPObject.ask);
 
-            Responses.BidResponse zarBidXRPObject = GetApiBid("https://api.valr.com/v1/public/XRPZAR/marketsummary");
-            double zarBidXRP = Math.Round(Convert.ToDouble(zarBidXRPObject.bidPrice), 2);
+                Responses.BidResponse zarBidXRPObject = GetApiBid("https://api.valr.com/v1/public/XRPZAR/marketsummary");
+                double zarBidXRP = Convert.ToDouble(zarBidXRPObject.bidPrice);
 
+                Responses.ExchangeResponse usdZarExchangeObject = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
+                double usdZarExchange = usdZarExchangeObject.conversion_rate;
 
-            Responses.ExchangeResponse usdZarExchangeObject = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
-            double usdZarExchange = usdZarExchangeObject.conversion_rate;
+                double xrpArbitrageValue = ArbitrageCaculator(zarBidXRP, usdAskXRP, usdZarExchange);
 
-            double xrpArbitrageValue = ArbitrageCaculator(zarBidXRP, usdAskXRP, usdZarExchange);
+                Dictionary<string, double> listObject = new Dictionary<string, double>();
+                listObject.Add("zarBidXRP", zarBidXRP);
+                listObject.Add("usdAskXRP", usdAskXRP);
+                listObject.Add("usdZarExchange", usdZarExchange);
+                listObject.Add("arbitrageCalculationForXRP", Math.Round(xrpArbitrageValue, 2));
 
-            Dictionary<string, double> listObject = new Dictionary<string, double>();
-            listObject.Add("zarBidXRP", zarBidXRP);
-            listObject.Add("usdAskXRP", usdAskXRP);
-            listObject.Add("usdZarExchange", usdZarExchange);
-            listObject.Add("arbitragecalculationforXRP", Math.Round(xrpArbitrageValue, 2));
-
-            return Json(listObject);
+                _logger.LogInformation($"Returning XRP Price Arbitage values and calculation result.");
+                return Json(listObject);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong: {ex}");
+                return Json(StatusCode(500, "Internal server error"));
+            }
         }
 
     }
