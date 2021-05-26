@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Price_Arbitrage_Calculator.Controllers.ControllerHelpers;
@@ -58,7 +59,7 @@ namespace Price_Arbitrage_Calculator.Controllers
             double bitCoinArbitrageValue=0;
             double xrpArbitrageValue=0;
 
-            BadRequestObjectResult errorObject = null ;
+            StatusCodeResult errorObject = null ;
 
             AskResponse usdAskBitCoinObject = new AskResponse();
             AskResponse usdAskXRPObject = new AskResponse();
@@ -66,14 +67,12 @@ namespace Price_Arbitrage_Calculator.Controllers
             BidResponse zarBidXRPObject = new BidResponse();
             ExchangeResponse usdZarExchangeObject = new ExchangeResponse();
 
-
             var task1 = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/btcusd/");
             var task2 = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/xrpusd/");
             var task3 = GetApiBid("https://api.valr.com/v1/public/BTCZAR/marketsummary");
             var task4 = GetApiBid("https://api.valr.com/v1/public/XRPZAR/marketsummary");
             var task5 = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
             await Task.WhenAll(task1, task2, task3, task4, task5); // Make all the API calls, at the same time, wait for them to come back at the same time
-
 
             //Asign the results to the objects, using await again, to make sure that no task is waiting for another
             var usdAskBitCoin = await task1 ; 
@@ -98,8 +97,8 @@ namespace Price_Arbitrage_Calculator.Controllers
             }
             else
             {
-                errorObject = usdAskBitCoin as BadRequestObjectResult;
-                bitCoin.Error = errorObject.Value.ToString();
+                errorObject = usdAskBitCoin as StatusCodeResult;
+                bitCoin.Error = errorObject.StatusCode.ToString();
             }
                
             if (usdAskXRPOkResult != null)
@@ -108,8 +107,8 @@ namespace Price_Arbitrage_Calculator.Controllers
             }
             else
             {
-                errorObject = usdAskXRP as BadRequestObjectResult;
-                xrp.Error = errorObject.Value.ToString();
+                errorObject = usdAskXRP as StatusCodeResult;
+                xrp.Error = errorObject.StatusCode.ToString();
             }
                 
             if (zarBidBitCoinOkResult != null)
@@ -118,8 +117,8 @@ namespace Price_Arbitrage_Calculator.Controllers
             }
             else
             {
-                errorObject = zarBidBitCoin as BadRequestObjectResult;
-                bitCoin.Error = errorObject.Value.ToString();
+                errorObject = zarBidBitCoin as StatusCodeResult;
+                bitCoin.Error = errorObject.StatusCode.ToString();
             }
                 
             if (zarBidXRPOkResult != null)
@@ -128,8 +127,8 @@ namespace Price_Arbitrage_Calculator.Controllers
             }
             else
             {
-                errorObject = zarBidXRP as BadRequestObjectResult;
-                xrp.Error = errorObject.Value.ToString();
+                errorObject = zarBidXRP as StatusCodeResult;
+                xrp.Error = errorObject.StatusCode.ToString();
             }
 
             if (usdZarExchangeOkResult != null)
@@ -138,9 +137,9 @@ namespace Price_Arbitrage_Calculator.Controllers
             }
             else
             {
-                errorObject = usdZarExchange as BadRequestObjectResult;
-                bitCoin.Error = errorObject.Value.ToString(); ;
-                xrp.Error = errorObject.Value.ToString(); ;
+                errorObject = usdZarExchange as StatusCodeResult;
+                bitCoin.Error = errorObject.StatusCode.ToString(); ;
+                xrp.Error = errorObject.StatusCode.ToString(); ;
             }
             
             if(String.IsNullOrEmpty(bitCoin.Error))
@@ -166,7 +165,6 @@ namespace Price_Arbitrage_Calculator.Controllers
             return Json(returnObject);
         }
       
-
         // USD ASK price
         /// <summary>
         /// Makes API Call to get ASK Price object
@@ -184,14 +182,14 @@ namespace Price_Arbitrage_Calculator.Controllers
                     var jsonDocument = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     responseObject = JsonConvert.DeserializeObject<AskResponse>(jsonDocument);
                 }
+                throw new Exception("Hello");
                 return Ok(responseObject);
 
             }
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred on  the API Call", ex);
-
-                return BadRequest(ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
 
         }
@@ -205,7 +203,6 @@ namespace Price_Arbitrage_Calculator.Controllers
         public async Task<IActionResult> GetApiBid(string ApiUrl)
         {
             BidResponse responseObject = new BidResponse();
-            
             try
             {
                 using (HttpClient client = new HttpClient())
@@ -215,15 +212,12 @@ namespace Price_Arbitrage_Calculator.Controllers
                     responseObject = JsonConvert.DeserializeObject<BidResponse>(jsonDocument);
                 }
                 return Ok(responseObject);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred on  the API Call", ex);
-
-                return BadRequest(ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
-
         }
 
         // USD ZAR Exchange Rate
@@ -245,13 +239,11 @@ namespace Price_Arbitrage_Calculator.Controllers
                 }
 
                 return Ok(responseObject);
-
             }
             catch (Exception ex)
             {
-
                 _logger.LogError("An error occurred on  the API Call", ex);
-                 return BadRequest(ex.Message);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
 
         }
@@ -279,7 +271,6 @@ namespace Price_Arbitrage_Calculator.Controllers
                 var task2 = GetApiBid("https://api.valr.com/v1/public/BTCZAR/marketsummary");
                 var task3 = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
                 await Task.WhenAll(task1, task2, task3);
-
 
                 var usdAskBitCoin = await task1;
                 OkObjectResult usdAskBitCoinOkResult = usdAskBitCoin as OkObjectResult;
@@ -354,7 +345,6 @@ namespace Price_Arbitrage_Calculator.Controllers
                 var task3 = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
                 await Task.WhenAll(task1, task2, task3);
 
-
                 var usdAskXRP = await task1;
                 OkObjectResult usdAskXRPOkResult = usdAskXRP as OkObjectResult;
 
@@ -405,6 +395,5 @@ namespace Price_Arbitrage_Calculator.Controllers
                 return Json(StatusCode(500, "Internal server error"));
             }
         }
-
     }
 }

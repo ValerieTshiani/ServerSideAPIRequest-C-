@@ -27,12 +27,12 @@ var Calculator = {
         if (data[0].error == null) 
             document.getElementById("bitcoin").innerHTML = data[0].data.bitCoinArbitrageValue;
         else
-            document.getElementById("bitcoin").innerHTML = data[0].error;
+            document.getElementById("bitcoin").innerHTML = "An error occured with the HTTP Error Code of "+ data[0].error;
 
         if (data[1].error == null)
             document.getElementById("xrp").innerHTML = data[1].data.xrpArbitrageValue;
         else
-            document.getElementById("xrp").innerHTML =  data[1].error ;
+            document.getElementById("xrp").innerHTML =  "An error occured with the HTTP Error Code of " + data[1].error ;
 
     }
 }
