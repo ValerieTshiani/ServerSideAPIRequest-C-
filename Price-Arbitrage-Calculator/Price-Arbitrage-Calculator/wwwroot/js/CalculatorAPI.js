@@ -2,8 +2,6 @@
 
 var Calculator = {
     GetValues: function () {
-        console.log("Step1");
-
         document.getElementById("bitcoin").innerHTML = "<div class='loader'></div>";
         document.getElementById("xrp").innerHTML = "<div class='loader'></div>";
 
@@ -25,8 +23,16 @@ var Calculator = {
             });
     },
     DisplayValues: function (data) {
-        console.log(data);
-        document.getElementById("bitcoin").innerHTML = data.bitCoinArbitrageValue;
-        document.getElementById("xrp").innerHTML = data.xrpArbitrageValue;
+
+        if (data[0].error == null) 
+            document.getElementById("bitcoin").innerHTML = data[0].data.bitCoinArbitrageValue;
+        else
+            document.getElementById("bitcoin").innerHTML = data[0].error;
+
+        if (data[1].error == null)
+            document.getElementById("xrp").innerHTML = data[1].data.xrpArbitrageValue;
+        else
+            document.getElementById("xrp").innerHTML = data[1].error;
+
     }
 }

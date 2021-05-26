@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static Price_Arbitrage_Calculator.Models.ErrorViewModel;
 
 namespace Price_Arbitrage_Calculator.Controllers
 {
@@ -49,6 +50,19 @@ namespace Price_Arbitrage_Calculator.Controllers
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 
+            JsonResponseObject bitCoin = new JsonResponseObject();
+            JsonResponseObject xrp = new JsonResponseObject();
+
+            double bitCoinArbitrageValue=0;
+            double xrpArbitrageValue=0;
+
+            Responses.AskResponse usdAskBitCoinObject = new Responses.AskResponse();
+            Responses.AskResponse usdAskXRPObject = new Responses.AskResponse();
+            Responses.BidResponse zarBidBitCoinObject = new Responses.BidResponse();
+            Responses.BidResponse zarBidXRPObject = new Responses.BidResponse();
+            Responses.ExchangeResponse usdZarExchangeObject = new Responses.ExchangeResponse();
+
+
             var task1 = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/btcusd/");
             var task2 = GetApiAsk("https://www.bitstamp.net/api/v2/ticker/xrpusd/");
             var task3 = GetApiBid("https://api.valr.com/v1/public/BTCZAR/marketsummary");
@@ -63,18 +77,52 @@ namespace Price_Arbitrage_Calculator.Controllers
             var zarBidXRP = await task4 as OkObjectResult;
             var usdZarExchange = await task5 as OkObjectResult;
 
-            var usdAskBitCoinObject = (Responses.AskResponse)usdAskBitCoin.Value;
-            var usdAskXRPObject = (Responses.AskResponse)usdAskXRP.Value;
-            var zarBidBitCoinObject = (Responses.BidResponse)zarBidBitCoin.Value;
-            var zarBidXRPObject = (Responses.BidResponse)zarBidXRP.Value;
-            var usdZarExchangeObject = (Responses.ExchangeResponse)usdZarExchange.Value;
+            if (usdAskBitCoin.StatusCode == (int)HttpStatusCode.OK)
+                usdAskBitCoinObject = (Responses.AskResponse)usdAskBitCoin.Value;
+            else
+                bitCoin.Error = usdAskBitCoin.StatusCode.ToString();
 
-            double bitCoinArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidBitCoinObject.bidPrice), Convert.ToDouble(usdAskBitCoinObject.ask), usdZarExchangeObject.conversion_rate);
-            double xrpArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidXRPObject.bidPrice), Convert.ToDouble(usdAskXRPObject.ask), usdZarExchangeObject.conversion_rate);
+            if (usdAskXRP.StatusCode == (int)HttpStatusCode.OK)
+                usdAskXRPObject = (Responses.AskResponse)usdAskXRP.Value;
+            else
+                xrp.Error = usdAskXRP.StatusCode.ToString();
 
-            Dictionary<string, double> returnObject = new Dictionary<string, double>();
-            returnObject.Add("bitCoinArbitrageValue", Math.Round(bitCoinArbitrageValue, 2));
-            returnObject.Add("xrpArbitrageValue", Math.Round(xrpArbitrageValue, 2));
+            if (zarBidBitCoin.StatusCode == (int)HttpStatusCode.OK)
+                zarBidBitCoinObject = (Responses.BidResponse)zarBidBitCoin.Value;
+            else
+                bitCoin.Error = zarBidBitCoin.StatusCode.ToString();
+
+            if (zarBidXRP.StatusCode == (int)HttpStatusCode.OK)
+                zarBidXRPObject = (Responses.BidResponse)zarBidXRP.Value;
+            else
+                xrp.Error = zarBidXRP.StatusCode.ToString();
+
+            if (usdZarExchange.StatusCode == (int)HttpStatusCode.OK)
+            {
+                usdZarExchangeObject = (Responses.ExchangeResponse)usdZarExchange.Value;
+            }
+            else
+            {
+                bitCoin.Error = usdZarExchange.StatusCode.ToString();
+                xrp.Error = usdZarExchange.StatusCode.ToString();
+            }
+            
+            if(String.IsNullOrEmpty(bitCoin.Error))
+                bitCoinArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidBitCoinObject.bidPrice), Convert.ToDouble(usdAskBitCoinObject.ask), usdZarExchangeObject.conversion_rate);
+            if (String.IsNullOrEmpty(xrp.Error))
+                xrpArbitrageValue = ArbitrageCaculator(Convert.ToDouble(zarBidXRPObject.bidPrice), Convert.ToDouble(usdAskXRPObject.ask), usdZarExchangeObject.conversion_rate);
+
+            Dictionary<string, double> bitCoinData = new Dictionary<string, double>();
+            bitCoinData.Add("bitCoinArbitrageValue", bitCoinArbitrageValue);
+            bitCoin.Data = bitCoinData;
+
+            Dictionary<string, double> xRPData = new Dictionary<string, double>();
+            xRPData.Add("xrpArbitrageValue", xrpArbitrageValue);
+            xrp.Data = xRPData;
+
+            List <JsonResponseObject> returnObject = new List<JsonResponseObject>();
+            returnObject.Add(bitCoin);
+            returnObject.Add(xrp);
 
             watch.Stop();
 
@@ -88,7 +136,7 @@ namespace Price_Arbitrage_Calculator.Controllers
         /// <returns> returns arbitrage value</returns>
         public static double ArbitrageCaculator(double zarBid, double usdAsk, double usdZarExchange)
         {
-            return (zarBid / (usdAsk * usdZarExchange));
+            return Math.Round((zarBid / (usdAsk * usdZarExchange)),2);
         }
 
         // USD ASK price
