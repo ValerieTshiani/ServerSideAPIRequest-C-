@@ -32,7 +32,7 @@ var Calculator = {
         if (data[1].error == null)
             document.getElementById("xrp").innerHTML = data[1].data.xrpArbitrageValue;
         else
-            document.getElementById("xrp").innerHTML = data[1].error;
+            document.getElementById("xrp").innerHTML =  data[1].error ;
 
     }
 }

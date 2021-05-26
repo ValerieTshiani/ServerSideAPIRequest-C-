@@ -56,6 +56,8 @@ namespace Price_Arbitrage_Calculator.Controllers
             double bitCoinArbitrageValue=0;
             double xrpArbitrageValue=0;
 
+            string serverError = "ServerError";
+
             Responses.AskResponse usdAskBitCoinObject = new Responses.AskResponse();
             Responses.AskResponse usdAskXRPObject = new Responses.AskResponse();
             Responses.BidResponse zarBidBitCoinObject = new Responses.BidResponse();
@@ -70,41 +72,43 @@ namespace Price_Arbitrage_Calculator.Controllers
             var task5 = GetApiExchange("https://v6.exchangerate-api.com/v6/1d3b83b2178cb028dba53670/pair/USD/ZAR");
             await Task.WhenAll(task1, task2, task3, task4, task5);
 
-           
+            
+
             var usdAskBitCoin = await task1 as OkObjectResult;
             var usdAskXRP = await task2 as OkObjectResult;
             var zarBidBitCoin = await task3 as OkObjectResult;
             var zarBidXRP = await task4 as OkObjectResult;
             var usdZarExchange = await task5 as OkObjectResult;
 
-            if (usdAskBitCoin.StatusCode == (int)HttpStatusCode.OK)
+
+            if (usdAskBitCoin != null && usdAskBitCoin.StatusCode == (int)HttpStatusCode.OK)
                 usdAskBitCoinObject = (Responses.AskResponse)usdAskBitCoin.Value;
             else
-                bitCoin.Error = usdAskBitCoin.StatusCode.ToString();
+                bitCoin.Error = "Server Error";
 
-            if (usdAskXRP.StatusCode == (int)HttpStatusCode.OK)
+            if (usdAskXRP != null && usdAskXRP.StatusCode == (int)HttpStatusCode.OK)
                 usdAskXRPObject = (Responses.AskResponse)usdAskXRP.Value;
             else
-                xrp.Error = usdAskXRP.StatusCode.ToString();
+                xrp.Error = serverError;
 
-            if (zarBidBitCoin.StatusCode == (int)HttpStatusCode.OK)
+            if (zarBidBitCoin != null && zarBidBitCoin.StatusCode == (int)HttpStatusCode.OK)
                 zarBidBitCoinObject = (Responses.BidResponse)zarBidBitCoin.Value;
             else
-                bitCoin.Error = zarBidBitCoin.StatusCode.ToString();
+                bitCoin.Error = serverError;
 
-            if (zarBidXRP.StatusCode == (int)HttpStatusCode.OK)
+            if (zarBidXRP != null && zarBidXRP.StatusCode == (int)HttpStatusCode.OK)
                 zarBidXRPObject = (Responses.BidResponse)zarBidXRP.Value;
             else
-                xrp.Error = zarBidXRP.StatusCode.ToString();
+                xrp.Error = serverError;
 
-            if (usdZarExchange.StatusCode == (int)HttpStatusCode.OK)
+            if (usdZarExchange != null && usdZarExchange.StatusCode == (int)HttpStatusCode.OK)
             {
                 usdZarExchangeObject = (Responses.ExchangeResponse)usdZarExchange.Value;
             }
             else
             {
-                bitCoin.Error = usdZarExchange.StatusCode.ToString();
-                xrp.Error = usdZarExchange.StatusCode.ToString();
+                bitCoin.Error = serverError;
+                xrp.Error = serverError;
             }
             
             if(String.IsNullOrEmpty(bitCoin.Error))
@@ -158,7 +162,6 @@ namespace Price_Arbitrage_Calculator.Controllers
                     var jsonDocument = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     responseObject = JsonConvert.DeserializeObject<Responses.AskResponse>(jsonDocument);
                 }
-
                 return Ok(responseObject);
 
             }
@@ -220,6 +223,7 @@ namespace Price_Arbitrage_Calculator.Controllers
                     var jsonDocument = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     responseObject = JsonConvert.DeserializeObject<Responses.ExchangeResponse>(jsonDocument);
                 }
+
                 return Ok(responseObject);
 
             }
