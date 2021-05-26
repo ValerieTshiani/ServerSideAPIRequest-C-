@@ -3,6 +3,10 @@
 var Calculator = {
     GetValues: function () {
         console.log("Step1");
+
+        document.getElementById("bitcoin").innerHTML = "<div class='loader'></div>";
+        document.getElementById("xrp").innerHTML = "<div class='loader'></div>";
+
         $.ajax({
             url: "/Home/GetValues",
             type: "POST",
@@ -22,7 +26,6 @@ var Calculator = {
     },
     DisplayValues: function (data) {
         console.log(data);
-      
         document.getElementById("bitcoin").innerHTML = data.bitCoinArbitrageValue;
         document.getElementById("xrp").innerHTML = data.xrpArbitrageValue;
     }
