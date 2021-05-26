@@ -34,7 +34,6 @@ namespace Price_Arbitrage_Calculator.Models
             public string changeFromPrevious { get; set; }
         }
 
-   
         public class ExchangeResponse
         {
             public string result { get; set; }
@@ -47,6 +46,13 @@ namespace Price_Arbitrage_Calculator.Models
             public string base_code { get; set; }
             public string target_code { get; set; }
             public double conversion_rate { get; set; }
+        }
+
+        public class JsonResponseObject
+        {
+            public string Error { get; set; }
+            public Dictionary<string, double> Data { get; set; }
+
         }
     }
 }

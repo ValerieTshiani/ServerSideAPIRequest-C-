@@ -9,11 +9,5 @@ namespace Price_Arbitrage_Calculator.Models
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
-        public class JsonResponseObject
-        {
-            public string Error { get; set; }
-            public Dictionary<string, double> Data {get; set;}
-
-        }
     }
 }
