@@ -182,7 +182,7 @@ namespace Price_Arbitrage_Calculator.Controllers
                     var jsonDocument = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     responseObject = JsonConvert.DeserializeObject<AskResponse>(jsonDocument);
                 }
-                throw new Exception("Hello");
+
                 return Ok(responseObject);
 
             }
